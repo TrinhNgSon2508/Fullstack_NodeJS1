@@ -1,3 +1,4 @@
+import { response } from 'express';
 import db from '../models/index'
 import CRUDService from '../services/CRUDService'
 
@@ -27,9 +28,52 @@ let postCRUD = async (req,res)=>{
     return res.send('post crud from server')
 }
 
+let displayGetCRUD = async (req,res) => {
+    let data = await CRUDService.getAllUser({
+        raw: true
+    })
+    return res.render('displaygetCRUD.ejs', {
+        dataTable: data  
+    })
+}
+
+let getEditCRUD = async(req,res) =>{
+    let userId = req.query.id
+    if(userId){
+        let userData = await CRUDService.getUserInfoById(userId)
+        // let userData
+        return res.render('editCRUD.ejs',{
+            user: userData
+        })
+    }else{
+        return res.send('User not found! ')
+    }
+}
+
+let putEditCRUD = async (req,res)=> {
+    let data = req.body
+    let allUsers = await CRUDService.updateUserData(data)
+    return res.render('displaygetCRUD.ejs',{
+        dataTable: allUsers
+    })
+}
+let deleteCRUD = async(req,res)=>{
+    let id = req.query.id
+    if(id){
+        await CRUDService.deleteUserById(id)
+        return res.send('Delete the user succeed!')
+    }else{
+        return res.send('User not found!')
+
+    }
+}
 module.exports = {
     getHomePage: getHomePage,
     getAboutPage: getAboutPage,
     getCRUD: getCRUD,
-    postCRUD: postCRUD
+    postCRUD: postCRUD,
+    displayGetCRUD: displayGetCRUD,
+    getEditCRUD: getEditCRUD,
+    putEditCRUD: putEditCRUD,
+    deleteCRUD: deleteCRUD,
 }
